@@ -39,7 +39,7 @@ namespace SamOS
                 Console.Beep();
                 Console.WriteLine("Terms and conditions: ");
                 Console.WriteLine("You may use this OS only for non-commercial purposes only, and use of this OS for commercial purposes, or to make a profit, is prohibited.");
-                Console.WriteLine("This OS is completely free for evreyone, and is open source, it is prohibited to add code to this OS that collects user data and sells it to a specific IP address or company.");
+                Console.WriteLine("This OS is completely free for evreyone, and is open source on GitHub, it is prohibited to add code to this OS that collects user data and sells it to a specific IP address or company.");
                 Console.WriteLine("Any attempt to make this OS subscription based, make this OS closed source, add malicious code, add code that spies on users or making this OS paid (except for optional donations to the community) is prohibited.");
                 Console.WriteLine("\nAgree?");
                 Console.WriteLine("y/Y or no args - Yes.");
