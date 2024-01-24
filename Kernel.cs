@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
@@ -21,13 +21,18 @@ using System.Linq;
 using Cosmos.HAL;
 using Cosmos.System.Network.Config;
 using System.Runtime.InteropServices;
+using Cosmos.System.FileSystem;
+using Cosmos.System.Network;
 
 namespace SamOS
 {
     public class Kernel : Sys.Kernel
     {
+        Sys.FileSystem.CosmosVFS fs = new Sys.FileSystem.CosmosVFS();
+        string working_dict = @"0:\";
         protected override void BeforeRun()
         {
+            Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
             try
             {
                 System.Threading.Thread.Sleep(1);
@@ -39,7 +44,7 @@ namespace SamOS
                 Console.Beep();
                 Console.WriteLine("Terms and conditions: ");
                 Console.WriteLine("You may use this OS only for non-commercial purposes only, and use of this OS for commercial purposes, or to make a profit, is prohibited.");
-                Console.WriteLine("This OS is completely free for evreyone, and is open source on GitHub, it is prohibited to add code to this OS that collects user data and sells it to a specific IP address or company.");
+                Console.WriteLine("This OS is completely free for evreyone, and is open source, it is prohibited to add code to this OS that collects user data and sells it to a specific IP address or company.");
                 Console.WriteLine("Any attempt to make this OS subscription based, make this OS closed source, add malicious code, add code that spies on users or making this OS paid (except for optional donations to the community) is prohibited.");
                 Console.WriteLine("\nAgree?");
                 Console.WriteLine("y/Y or no args - Yes.");
@@ -69,7 +74,7 @@ namespace SamOS
                     Cosmos.System.Power.Reboot();
                 }
             }
-            catch (Exception e) { Console.Clear();  Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("Exception Occured: " + e.ToString()); Console.WriteLine("Press any key to shut down... ");
+            catch (Exception e) { Console.Clear(); Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("Exception Occured: " + e.ToString()); Console.WriteLine("Press any key to shut down... ");
                 Console.ReadKey(); Console.ForegroundColor = ConsoleColor.White; Console.Clear(); Console.WriteLine("Shutting Down... "); System.Threading.Thread.Sleep(2); Console.Beep(); Cosmos.System.Power.Shutdown(); }
         }
 
@@ -90,7 +95,7 @@ namespace SamOS
                 {
                     DateTime time = DateTime.Now;
                     var invalidcommand_msg = "Invalid Command, to get help about valid commands, type 'help'.";
-                    var old_prompt = "> ";
+                    var old_prompt = working_dict + "> ";
                     List<string> commandhistory = new List<string>();
                     Console.Clear();
                     Console.Beep();
@@ -136,6 +141,22 @@ namespace SamOS
                             }
                             while (true)
                             {
+                                if (File.Exists(@"0:\Test.txt") == false)
+                                {
+                                    var FirstFile = File.Create(@"0:\Test.txt");
+                                }
+                                else
+                                {
+
+                                }
+                                if (Directory.Exists(@"0:\New") == false)
+                                {
+                                    var FirstDict = Directory.CreateDirectory(@"0:\New");
+                                }
+                                else
+                                {
+
+                                }
                                 Console.Write(old_prompt);
                                 var input = Console.ReadLine();
                                 if (string.IsNullOrWhiteSpace(input))
@@ -150,7 +171,7 @@ namespace SamOS
                                         Console.WriteLine("print <text> - Prints text on the screen.");
                                         Console.WriteLine("shutdown - Shuts down or reboots the computer, use 's' for shutdown, and 'r' for reboot, in this format: 'shutdown <s/r>'.");
                                         Console.WriteLine("help - Shows infomation about commands.");
-                                        Console.WriteLine("clear/cls - Clears the screen.");
+                                        Console.WriteLine("clear - Clears the screen.");
                                         Console.WriteLine("account <usr/psw> - Displays info about your SamOS account, 'usr' for username, 'psw' for password, or blank for both.");
                                         Console.WriteLine("about - Know about SamOS");
                                         Console.WriteLine("pause <true/false> - Pauses the console until any key is pressed, if the value after semicolon is 'true', it will show the 'Press any key to continue...', if the value is 'false', it will not show the output.");
@@ -167,7 +188,14 @@ namespace SamOS
                                         Console.WriteLine("mulprint <statements>: Prints multiple lines of text in a single command, each sentence is seperated by commas.");
                                         Console.WriteLine("math: Adds, subtracts, multiplies, or divides numbers.");
                                         Console.WriteLine("rprint <text>: Prints text in reverse.");
-                                        Console.WriteLine("To get more infomation on a specific command, type 'help <command-name>'.");
+                                        Console.WriteLine("cr: Creates a file or directory.");
+                                        Console.WriteLine("write: Writes text to a file.");
+                                        Console.WriteLine("read: Prints all contents of a file.");
+                                        Console.WriteLine("rm: Removes a file or directory.");
+                                        Console.WriteLine("copy: Copies a file.");
+                                        Console.WriteLine("ls: Displays contents of the current working directory.");
+                                        Console.WriteLine("cd: Changes the working directory.");
+                                        Console.WriteLine("To get more infomation on a specific command with specific valid args, type 'help <command-name>'.");
                                         Console.WriteLine("Each Command is case-sensitive, and commands can only be entered in lowercase letters, each command with specific valid args has a '?' argument that displays more infomation about the command.");
                                     }
                                     else if (argTwo == "shutdown")
@@ -276,7 +304,7 @@ namespace SamOS
                                         Console.ForegroundColor = ConsoleColor.White;
                                     }
                                 }
-                                else if (input == "clear" || input == "cls")
+                                else if (input == "clear")
                                 {
                                     Console.Clear();
                                     commandhistory.Add(input);
@@ -342,6 +370,7 @@ namespace SamOS
                                         Console.WriteLine("Invalid Argument, please type 'help account' to get help with the args.");
                                         Console.ForegroundColor = ConsoleColor.White;
                                     }
+                                    commandhistory.Add(input);
                                 }
                                 else if (input.StartsWith("sleep "))
                                 {
@@ -371,6 +400,10 @@ namespace SamOS
                                     var amountOfRAM = GCImplementation.GetAvailableRAM();
                                     var UsedRAM = GCImplementation.GetUsedRAM();
                                     var NewUsedRAM = UsedRAM / 1024;
+                                    var Disks = VFSManager.GetDisks();
+                                    var FSpace = fs.GetAvailableFreeSpace(@"0:\");
+                                    var FSpaceMB = FSpace / (1024 * 1024);
+                                    var FSType = fs.GetFileSystemType(@"0:\");
                                     var NetAllocated = HeapSmall.GetAllocatedObjectCount();
                                     Console.WriteLine("Amount of RAM: " + amountOfRAM + " MB");
                                     Console.WriteLine("Used RAM (in KB): " + NewUsedRAM + " KB");
@@ -380,15 +413,149 @@ namespace SamOS
                                     Console.WriteLine("OS Name: SamOS");
                                     Console.WriteLine("OS made by: Samdasti\\Windows123123MM");
                                     Console.WriteLine("PC Name: " + PCName);
+                                    Console.WriteLine("Disks: " + Disks);
+                                    Console.WriteLine("Free Disk Space (in bytes): " + FSpace + " bytes");
+                                    Console.WriteLine("Free Disk Space (in MB): " + FSpaceMB + " MB");
+                                    Console.WriteLine("Filesystem Type: " + FSType);
                                     Console.WriteLine("Number of Allocated Objects: " + NetAllocated);
                                     Console.WriteLine("Session Name: " + SessionName);
                                     Console.WriteLine("OS made with: Cosmos OS C# (userkit), in visual studio 2022.");
                                     commandhistory.Add(input);
                                 }
+                                else if (input == "ls")
+                                {
+                                    try
+                                    {
+                                        Console.WriteLine("Contents of " + working_dict + ": ");
+                                        var dict1 = Directory.GetFiles(working_dict);
+                                        var dict2 = Directory.GetDirectories(working_dict);
+                                        foreach (var dict11 in dict1)
+                                        {
+                                            Console.WriteLine(dict11);
+                                        }
+                                        foreach (var dict12 in dict2)
+                                        {
+                                            Console.WriteLine(dict12 + "    <DIR>");
+                                        }
+                                    }
+                                    catch (FileNotFoundException)
+                                    {
+                                        Console.WriteLine("Directory " + working_dict + " not found.");
+                                    }
+                                    commandhistory.Add(input);
+                                }
+                                else if (input == "cr f")
+                                {
+                                    var FilePath = input.Remove(0, 5);
+                                    var File2beMade = Path.Combine(working_dict, FilePath);
+                                    var NewFile = File.Create(@File2beMade);
+                                    commandhistory.Add(input);
+                                }
+                                else if (input == "cr d")
+                                {
+                                    var DictPath = input.Remove(0, 5);
+                                    var Dict2beMade = Path.Combine(working_dict, DictPath);
+                                    var NewDict = Directory.CreateDirectory(@Dict2beMade);
+                                    commandhistory.Add(input);
+                                }
+                                else if (input == "rm f")
+                                {
+                                    try
+                                    {
+                                        Console.Write("Enter file path to delete: ");
+                                        var Ftbd = Console.ReadLine();
+                                        var filetobedeleted = Path.Combine(working_dict, Ftbd);
+                                        File.Delete(@filetobedeleted);
+                                    }
+                                    catch (FileNotFoundException)
+                                    {
+                                        Console.WriteLine("File not found.");
+                                    }
+                                    commandhistory.Add(input);
+                                }
+                                else if (input == "rm d")
+                                {
+                                    try
+                                    {
+                                        Console.Write("Enter dict to delete: ");
+                                        var DelDict = Console.ReadLine();
+                                        var dicttobedeleted = Path.Combine(working_dict, DelDict);
+                                        Directory.Delete(@dicttobedeleted);
+                                    }
+                                    catch (FileNotFoundException)
+                                    {
+                                        Console.WriteLine("Directory not found.");
+                                    }
+                                    commandhistory.Add(input);
+                                }
+                                else if (input == "write")
+                                {
+                                    try
+                                    {
+                                        Console.Write("Enter file path for text to be written to: ");
+                                        var FileforTexttobeWrittenTo = Console.ReadLine();
+                                        Console.Write("Enter text to write to file " + FileforTexttobeWrittenTo + ": ");
+                                        var Texttobewrittentofile = Console.ReadLine();
+                                        File.WriteAllText(@FileforTexttobeWrittenTo, Texttobewrittentofile);
+                                    }
+                                    catch (FileNotFoundException)
+                                    {
+                                        Console.WriteLine("File not found.");
+                                    }
+                                    commandhistory.Add(input);
+                                }
+                                else if (input == "read")
+                                {
+                                    try
+                                    {
+                                        Console.Write("Enter file Path to be read: ");
+                                        var FileRead = Console.ReadLine();
+                                        var TextofFile = File.ReadAllLines(@FileRead);
+                                        foreach (var line in TextofFile)
+                                        {
+                                            Console.WriteLine(line);
+                                        }
+                                    }
+                                    catch (FileNotFoundException)
+                                    {
+                                        Console.WriteLine("File not found.");
+                                    }
+                                    commandhistory.Add(input);
+                                }
+                                else if (input == "copy")
+                                {
+                                    try
+                                    {
+                                        Console.Write("Enter initial file path: ");
+                                        var FiletobeCopied = Console.ReadLine();
+                                        Console.Write("Enter path for file to be copied to: ");
+                                        var DestPath = Console.ReadLine();
+                                        var DestPath2 = Path.Combine(working_dict, DestPath);
+                                        File.Copy(@FiletobeCopied, @DestPath2);
+                                    }
+                                    catch (FileNotFoundException)
+                                    {
+                                        Console.WriteLine("File not found.");
+                                    }
+                                }
+                                else if (input == "cr ?")
+                                {
+                                    Console.WriteLine("Creates a file or directory.");
+                                    Console.WriteLine("Parameters: ");
+                                    Console.WriteLine("f - Creates a file in the current working directory.");
+                                    Console.WriteLine("d - Creates a subdirectory in the current working directory.");
+                                }
+                                else if (input == "rm ?")
+                                {
+                                    Console.WriteLine("Removes a file or directory.");
+                                    Console.WriteLine("Parameters: ");
+                                    Console.WriteLine("f - Deletes a file.");
+                                    Console.WriteLine("d - Deletes a directory.");
+                                }
                                 else if (input.StartsWith("prompt"))
                                 {
                                     var new_prompt = input.Remove(0, 7);
-                                    if (!(input == "> "))
+                                    if (!(input == (working_dict + "> ")))
                                     {
                                         old_prompt = new_prompt;
                                         commandhistory.Add(input);
@@ -397,14 +564,14 @@ namespace SamOS
                                     {
                                         Console.Beep();
                                         Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("Entered command must be custom command, to use this prompt '> ', please type resetprompt instead.");
+                                        Console.WriteLine("Entered command must be custom command, to use this prompt '" + working_dict + "> ', please type resetprompt instead.");
                                         Console.ForegroundColor = ConsoleColor.White;
                                         commandhistory.Add(input);
                                     }
                                 }
                                 else if (input == "resetprompt")
                                 {
-                                    old_prompt = "> ";
+                                    old_prompt = working_dict + "> ";
                                     commandhistory.Add(input);
                                 }
                                 else if (input.StartsWith("pcname"))
@@ -439,7 +606,7 @@ namespace SamOS
                                     }
                                     if (!(old_prompt == "> "))
                                     {
-                                        old_prompt = "> ";
+                                        old_prompt = working_dict + "> ";
                                     }
                                     else
                                     {
@@ -595,6 +762,7 @@ namespace SamOS
                                         int num2_1 = int.Parse(num21);
                                         var result = num1_1 + num2_1;
                                         Console.WriteLine(result);
+                                        commandhistory.Add(input);
                                     }
                                     else if (value1 == "sub")
                                     {
@@ -606,6 +774,7 @@ namespace SamOS
                                         int num2_2 = int.Parse(num22);
                                         var result2 = num1_2 - num2_2;
                                         Console.WriteLine(result2);
+                                        commandhistory.Add(input);
                                     }
                                     else if (value1 == "mul")
                                     {
@@ -617,6 +786,7 @@ namespace SamOS
                                         int num2_3 = int.Parse(num23);
                                         var result3 = num1_3 * num2_3;
                                         Console.WriteLine(result3);
+                                        commandhistory.Add(input);
                                     }
                                     else if (value1 == "div")
                                     {
@@ -635,6 +805,7 @@ namespace SamOS
                                         {
                                             Console.WriteLine("Cannot divide by Zero.");
                                         }
+                                        commandhistory.Add(input);
                                     }
                                     else
                                     {
@@ -651,6 +822,20 @@ namespace SamOS
                                     Array.Reverse(revcharacters);
                                     string revstr = new string(revcharacters);
                                     Console.WriteLine(revcharacters);
+                                    commandhistory.Add(input);
+                                }
+                                else if (input.StartsWith("cd"))
+                                {
+                                    var new_workingdict = input.Remove(0, 3);
+                                    if (VFSManager.DirectoryExists(new_workingdict) == true)
+                                    {
+                                        var working_dict = new_workingdict;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Directory " + input.Remove(0, 3) + " not found.");
+                                    }
+                                    commandhistory.Add(input);
                                 }
                                 else
                                 {
