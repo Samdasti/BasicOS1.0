@@ -23,6 +23,7 @@ using Cosmos.System.Network.Config;
 using System.Runtime.InteropServices;
 using Cosmos.System.FileSystem;
 using Cosmos.System.Network;
+using Cosmos.System.Network.IPv4;
 
 namespace SamOS
 {
@@ -44,7 +45,7 @@ namespace SamOS
                 Console.Beep();
                 Console.WriteLine("Terms and conditions: ");
                 Console.WriteLine("You may use this OS only for non-commercial purposes only, and use of this OS for commercial purposes, or to make a profit, is prohibited.");
-                Console.WriteLine("This OS is completely free for evreyone, and is open source, it is prohibited to add code to this OS that collects user data and sells it to a specific IP address or company.");
+                Console.WriteLine("This OS is completely free for evreyone, it is prohibited to add code to this OS that collects user data and sells it to a specific IP address or company.");
                 Console.WriteLine("Any attempt to make this OS subscription based, make this OS closed source, add malicious code, add code that spies on users or making this OS paid (except for optional donations to the community) is prohibited.");
                 Console.WriteLine("\nAgree?");
                 Console.WriteLine("y/Y or no args - Yes.");
@@ -58,7 +59,7 @@ namespace SamOS
                 else if (UserChoice == "n" || UserChoice == "N")
                 {
                     Console.Clear();
-                    Console.WriteLine("Shutting Down...");
+                    Console.WriteLine(File.ReadAllLines(@"0:\ShutdownMsg.txt"));
                     System.Threading.Thread.Sleep(1);
                     Console.Beep();
                     Cosmos.System.Power.Shutdown();
@@ -94,8 +95,7 @@ namespace SamOS
                 try
                 {
                     DateTime time = DateTime.Now;
-                    var invalidcommand_msg = "Invalid Command, to get help about valid commands, type 'help'.";
-                    var old_prompt = working_dict + "> ";
+                    var old_prompt = "> ";
                     List<string> commandhistory = new List<string>();
                     Console.Clear();
                     Console.Beep();
@@ -131,43 +131,31 @@ namespace SamOS
                         {
                             Console.Beep();
                             Console.Clear();
-                            if (time.Month == 12 && time.Day == 25)
-                            {
-                                Console.WriteLine("Merry Christmas! Type 'help' to get help with commands HO HO HO!");
-                            }
-                            else
-                            {
-                                Console.WriteLine("Welcome to SamOS, to get infomation about commands, type 'help'.");
-                            }
+                            Console.WriteLine("Welcome to SamOS! To get infomation about commands, type 'help'.");
                             while (true)
                             {
-                                if (File.Exists(@"0:\Test.txt") == false)
+                                if (File.Exists(@"0:\Kudzu.txt") == false)
                                 {
-                                    var FirstFile = File.Create(@"0:\Test.txt");
+                                    var FirstFile = File.Create(@"0:\Kudzu.txt");
                                 }
-                                else
+                                if (File.Exists(@"0:\Root.txt") == false)
                                 {
-
-                                }
-                                if (Directory.Exists(@"0:\New") == false)
-                                {
-                                    var FirstDict = Directory.CreateDirectory(@"0:\New");
-                                }
-                                else
-                                {
-
+                                    var SecondFile = File.Create(@"0:\Root.txt");
                                 }
                                 Console.Write(old_prompt);
                                 var input = Console.ReadLine();
                                 if (string.IsNullOrWhiteSpace(input))
                                 {
-
+                                    continue;
                                 }
                                 else if (input.StartsWith("help"))
                                 {
                                     var argTwo = input.Remove(0, 5);
                                     if (string.IsNullOrWhiteSpace(argTwo) || argTwo == "all")
                                     {
+                                        Console.Clear();
+                                        Console.WriteLine("Commands: ");;
+                                        Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------");
                                         Console.WriteLine("print <text> - Prints text on the screen.");
                                         Console.WriteLine("shutdown - Shuts down or reboots the computer, use 's' for shutdown, and 'r' for reboot, in this format: 'shutdown <s/r>'.");
                                         Console.WriteLine("help - Shows infomation about commands.");
@@ -175,14 +163,16 @@ namespace SamOS
                                         Console.WriteLine("account <usr/psw> - Displays info about your SamOS account, 'usr' for username, 'psw' for password, or blank for both.");
                                         Console.WriteLine("about - Know about SamOS");
                                         Console.WriteLine("pause <true/false> - Pauses the console until any key is pressed, if the value after semicolon is 'true', it will show the 'Press any key to continue...', if the value is 'false', it will not show the output.");
-                                        Console.WriteLine("prompt <prompt_here> - Sets the custom prompt.");
+                                        Console.WriteLine("prompt <prompt_here> - Sets the prompt for the SamOS Console.");
                                         Console.WriteLine("systeminfo - Displays system infomation.");
+                                        Console.ReadKey();
+                                        Console.Clear();
                                         Console.WriteLine("resetprompt: Resets prompt to default");
                                         Console.WriteLine("pcname <pc-name>: Changes the PC name.");
                                         Console.WriteLine("datetime: Displays date and time.");
                                         Console.WriteLine("sleep <number-of-secs>: Pauses the SamOS console for a specified amount of seconds.");
-                                        Console.WriteLine("invmsg <message>: Allows a user to change the message that pops up when the user enters a invalid command.");
-                                        Console.WriteLine("resetinvmsg: Resets the message that pops up when a user enters a invalid command, to the default one.");
+                                        Console.ReadKey();
+                                        Console.Clear();
                                         Console.WriteLine("tcolor <color>: Changes the text color.");
                                         Console.WriteLine("bcolor <color>: Changes the background color.");
                                         Console.WriteLine("mulprint <statements>: Prints multiple lines of text in a single command, each sentence is seperated by commas.");
@@ -192,11 +182,26 @@ namespace SamOS
                                         Console.WriteLine("write: Writes text to a file.");
                                         Console.WriteLine("read: Prints all contents of a file.");
                                         Console.WriteLine("rm: Removes a file or directory.");
+                                        Console.ReadKey();
+                                        Console.Clear();
                                         Console.WriteLine("copy: Copies a file.");
                                         Console.WriteLine("ls: Displays contents of the current working directory.");
                                         Console.WriteLine("cd: Changes the working directory.");
                                         Console.WriteLine("To get more infomation on a specific command with specific valid args, type 'help <command-name>'.");
                                         Console.WriteLine("Each Command is case-sensitive, and commands can only be entered in lowercase letters, each command with specific valid args has a '?' argument that displays more infomation about the command.");
+                                        Console.WriteLine("rand - Picks a random number within a specified range.");
+                                        Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------");
+                                        Console.WriteLine("\nPress Any Key to continue... ");
+                                        Console.ReadKey();
+                                        Console.Clear();
+                                        if (time.Month == 12 && time.Day == 25)
+                                        {
+                                            Console.WriteLine("Merry Christmas! Type 'help' to get help with commands HO HO HO!");
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Welcome to SamOS, to get infomation about commands, type 'help'.");
+                                        }
                                     }
                                     else if (argTwo == "shutdown")
                                     {
@@ -277,7 +282,7 @@ namespace SamOS
                                     {
                                         Console.Clear();
                                         Console.Beep();
-                                        Console.WriteLine("Shutting Down... ");
+                                        Console.WriteLine("Shutting Down...");
                                         System.Threading.Thread.Sleep(1);
                                         Cosmos.System.Power.Shutdown();
                                     }
@@ -285,7 +290,7 @@ namespace SamOS
                                     {
                                         Console.Clear();
                                         Console.Beep();
-                                        Console.WriteLine("Restarting... ");
+                                        Console.WriteLine("Restarting...");
                                         System.Threading.Thread.Sleep(1);
                                         Cosmos.System.Power.Reboot();
                                     }
@@ -389,6 +394,11 @@ namespace SamOS
                                         Console.WriteLine("<EMPTY>");
                                     }
                                     commandhistory.Add(input);
+                                }
+                                else if (input.StartsWith("invmsg"))
+                                {
+                                    var new_invmsg = input.Remove(0, 6);
+                                    File.WriteAllText(@"0:\InvMsg.txt", new_invmsg);
                                 }
                                 else if (input == "clearhistory")
                                 {
@@ -554,25 +564,8 @@ namespace SamOS
                                 }
                                 else if (input.StartsWith("prompt"))
                                 {
-                                    var new_prompt = input.Remove(0, 7);
-                                    if (!(input == (working_dict + "> ")))
-                                    {
-                                        old_prompt = new_prompt;
-                                        commandhistory.Add(input);
-                                    }
-                                    else
-                                    {
-                                        Console.Beep();
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("Entered command must be custom command, to use this prompt '" + working_dict + "> ', please type resetprompt instead.");
-                                        Console.ForegroundColor = ConsoleColor.White;
-                                        commandhistory.Add(input);
-                                    }
-                                }
-                                else if (input == "resetprompt")
-                                {
-                                    old_prompt = working_dict + "> ";
-                                    commandhistory.Add(input);
+                                    var new_prompt = input.Remove(0, 6);
+                                    var oldprompt = new_prompt;
                                 }
                                 else if (input.StartsWith("pcname"))
                                 {
@@ -596,23 +589,10 @@ namespace SamOS
                                     Console.Beep();
                                     System.Threading.Thread.Sleep(1);
                                     Console.Clear();
-                                    if (time.Month == 12 && time.Day == 25)
-                                    {
-                                        Console.WriteLine("Merry Christmas! Type 'help' to get help with commands HO!");
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Welcome to SamOS, to get infomation about commands, type 'help'.");
-                                    }
                                     if (!(old_prompt == "> "))
                                     {
-                                        old_prompt = working_dict + "> ";
+                                        old_prompt = "> ";
                                     }
-                                    else
-                                    {
-
-                                    }
-                                    commandhistory.Add(input);
                                 }
                                 else if (input.StartsWith("bcolor"))
                                 {
@@ -726,17 +706,7 @@ namespace SamOS
                                         Console.WriteLine("Invalid Argument, please type 'help tcolor' to get help with args.");
                                         Console.ForegroundColor = ConsoleColor.White;
                                     }
-                                    commandhistory.Add(input);
-                                }
-                                else if (input.StartsWith("invmsg"))
-                                {
-                                    var new_invmsg = input.Remove(0, 7);
-                                    invalidcommand_msg = new_invmsg;
-                                    commandhistory.Add(input);
-                                }
-                                else if (input == "resetinvmsg")
-                                {
-                                    invalidcommand_msg = "Invalid Command, to get help about valid commands, type 'help'.";
+
                                     commandhistory.Add(input);
                                 }
                                 else if (input.StartsWith("mulprint"))
@@ -762,7 +732,6 @@ namespace SamOS
                                         int num2_1 = int.Parse(num21);
                                         var result = num1_1 + num2_1;
                                         Console.WriteLine(result);
-                                        commandhistory.Add(input);
                                     }
                                     else if (value1 == "sub")
                                     {
@@ -774,7 +743,6 @@ namespace SamOS
                                         int num2_2 = int.Parse(num22);
                                         var result2 = num1_2 - num2_2;
                                         Console.WriteLine(result2);
-                                        commandhistory.Add(input);
                                     }
                                     else if (value1 == "mul")
                                     {
@@ -786,7 +754,6 @@ namespace SamOS
                                         int num2_3 = int.Parse(num23);
                                         var result3 = num1_3 * num2_3;
                                         Console.WriteLine(result3);
-                                        commandhistory.Add(input);
                                     }
                                     else if (value1 == "div")
                                     {
@@ -805,7 +772,6 @@ namespace SamOS
                                         {
                                             Console.WriteLine("Cannot divide by Zero.");
                                         }
-                                        commandhistory.Add(input);
                                     }
                                     else
                                     {
@@ -837,11 +803,24 @@ namespace SamOS
                                     }
                                     commandhistory.Add(input);
                                 }
+                                else if (input == "rand")
+                                {
+                                    Console.Write("Enter 1st number: ");
+                                    var firstnumber = Console.ReadLine();
+                                    int fstnum = int.Parse(firstnumber);
+                                    Console.Write("Enter 2nd number: ");
+                                    var secondnumber = Console.ReadLine();
+                                    var sndnum = int.Parse(secondnumber);
+                                    Random rand = new Random();
+                                    var result = rand.Next(fstnum, sndnum);
+                                    Console.WriteLine(result);
+
+                                }
                                 else
                                 {
                                     Console.Beep();
                                     Console.ForegroundColor = ConsoleColor.Red;
-                                    Console.WriteLine(invalidcommand_msg);
+                                    Console.WriteLine("Invalid command, to get help about commands, type 'help'.");
                                     Console.ForegroundColor = ConsoleColor.White;
                                     commandhistory.Add(input);
                                 }
